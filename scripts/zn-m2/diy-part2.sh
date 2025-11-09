@@ -16,3 +16,14 @@ git clone --depth=1 https://github.com/nikkinikki-org/OpenWrt-nikki package/nikk
 git clone https://github.com/sirpdboy/luci-app-lucky.git package/lucky
 git clone https://github.com/sirpdboy/luci-app-timecontrol package/luci-app-timecontrol
 git clone https://github.com/zzsj0928/luci-app-pushbot package/luci-app-pushbot
+
+# Git稀疏克隆，只克隆指定目录到本地
+function git_sparse_clone() {
+  branch="$1" repourl="$2" && shift 2
+  git clone --depth=1 -b $branch --single-branch --filter=blob:none --sparse $repourl
+  repodir=$(echo $repourl | awk -F '/' '{print $(NF)}')
+  cd $repodir && git sparse-checkout set $@
+  mv -f $@ ../package
+  cd .. && rm -rf $repodir
+}
+git_sparse_clone master https://github.com/vernesong/OpenClash package/luci-app-openclash
